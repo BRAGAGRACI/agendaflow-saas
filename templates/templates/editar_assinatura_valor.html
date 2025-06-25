@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-5">
+  <h2 class="text-center fw-bold mb-4" style="color: #4a00e0;">Editar Assinatura</h2>
+  <div class="card shadow rounded p-4">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+    <form method="POST">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label for="estabelecimento" class="form-label">Estabelecimento</label>
+        <input type="text" class="form-control" id="estabelecimento" value="{{ assinatura.estabelecimento.nome }}" disabled>
+      </div>
+      <div class="mb-3">
+        <label for="plano" class="form-label">Plano</label>
+        <input type="text" class="form-control" id="plano" value="{{ assinatura.plano.nome }}" disabled>
+      </div>
+      <div class="mb-3">
+        <label for="valor_pago" class="form-label">Valor Pago (R$)</label>
+        <input type="number" class="form-control" id="valor_pago" name="valor_pago" value="{{ assinatura.valor_pago|floatformat:2 }}" step="0.01" required>
+      </div>
+      <div class="mb-3">
+        <label for="data_validade" class="form-label">Data de Validade</label>
+        <input type="date" class="form-control" id="data_validade" name="data_validade" value="{{ assinatura.data_validade|date:'Y-m-d' }}" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Salvar</button>
+      <a href="{% url 'painel_administrador' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

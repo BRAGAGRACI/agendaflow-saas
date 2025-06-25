@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="card shadow-sm p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">{{ titulo }}</h2>
+            <div class="text-end">
+                <div class="small text-muted">
+                    Plano: <span class="fw-semibold text-primary">{{ plano_atual }}</span>
+                </div>
+                <div class="small text-muted">
+                    Profissionais: {{ estabelecimento.profissional_set.count }}/{{ limite_profissionais }}
+                    {% if profissionais_restantes > 0 %}
+                        <span class="text-success">({{ profissionais_restantes }} restantes)</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% if not pode_adicionar %}
+            <div class="alert alert-warning d-flex align-items-center mb-4" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <div>
+                    <div class="fw-bold">Limite de profissionais atingido!</div>
+                    <div class="small">Você atingiu o limite de {{ limite_profissionais }} profissionais do plano {{ plano_atual }}.</div>
+                    <a href="{% url 'planos' %}" class="alert-link">Atualize seu plano para adicionar mais profissionais</a>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if pode_adicionar %}
+            <div class="alert alert-info d-flex align-items-center justify-content-between mb-4" role="alert">
+                <div>
+                    <div class="fw-medium">Plano Atual: {{ plano_atual }}</div>
+                    <div class="small mt-1">
+                        Você pode adicionar mais <span class="fw-bold text-success">{{ profissionais_restantes }}</span> profissional{% if profissionais_restantes != 1 %}is{% endif %}
+                    </div>
+                </div>
+                <div class="text-end">
+                    <div class="h5 fw-bold text-primary mb-0">{{ estabelecimento.profissional_set.count }}/{{ limite_profissionais }}</div>
+                </div>
+            </div>
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger" role="alert">
+                    <ul class="errorlist">
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <form method="post" id="form-profissional" novalidate>
+                {% csrf_token %}
+                <style>
+                    .form-control { margin-bottom: 1rem; }
+                    label { font-weight: 500; margin-bottom: 0.5rem; display: block; }
+                    .errorlist { color: #dc3545; font-size: 0.875rem; list-style: none; padding: 0; margin: 0.25rem 0 0 0; }
+                    .form-group { margin-bottom: 1.5rem; }
+                    .required label::after { content: " *"; color: #dc3545; }
+                </style>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group {% if form.nome.errors %}has-error{% endif %} required">
+                            <label for="{{ form.nome.id_for_label }}">{{ form.nome.label }}</label>
+                            {{ form.nome }}
+                            {% if form.nome.errors %}
+                                <ul class="errorlist">
+                                    {% for error in form.nome.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group {% if form.especialidade.errors %}has-error{% endif %}">
+                            <label for="{{ form.especialidade.id_for_label }}">{{ form.especialidade.label }}</label>
+                            {{ form.especialidade }}
+                            {% if form.especialidade.errors %}
+                                <ul class="errorlist">
+                                    {% for error in form.especialidade.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group {% if form.cpf.errors %}has-error{% endif %}">
+                            <label for="{{ form.cpf.id_for_label }}">{{ form.cpf.label }}</label>
+                            {{ form.cpf }}
+                            {% if form.cpf.errors %}
+                                <ul class="errorlist">
+                                    {% for error in form.cpf.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group {% if form.cnpj.errors %}has-error{% endif %}">
+                            <label for="{{ form.cnpj.id_for_label }}">{{ form.cnpj.label }}</label>
+                            {{ form.cnpj }}
+                            {% if form.cnpj.errors %}
+                                <ul class="errorlist">
+                                    {% for error in form.cnpj.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group {% if form.telefone.errors %}has-error{% endif %}">
+                            <label for="{{ form.telefone.id_for_label }}">{{ form.telefone.label }}</label>
+                            {{ form.telefone }}
+                            {% if form.telefone.errors %}
+                                <ul class="errorlist">
+                                    {% for error in form.telefone.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group {% if form.email.errors %}has-error{% endif %}">
+                            <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <ul class="errorlist">
+                                    {% for error in form.email.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-group {% if form.endereco.errors %}has-error{% endif %}">
+                            <label for="{{ form.endereco.id_for_label }}">{{ form.endereco.label }}</label>
+                            {{ form.endereco }}
+                            {% if form.endereco.errors %}
+                                <ul class="errorlist">
+                                    {% for error in form.endereco.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group {% if form.percentual_comissao.errors %}has-error{% endif %}">
+                            <label for="{{ form.percentual_comissao.id_for_label }}">{{ form.percentual_comissao.label }}</label>
+                            {{ form.percentual_comissao }}
+                            {% if form.percentual_comissao.errors %}
+                                <ul class="errorlist">
+                                    {% for error in form.percentual_comissao.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                    <a href="{% url 'lista_profissional' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Voltar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Salvar Profissional
+                    </button>
+                </div>
+            </form>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-user-times text-muted" style="font-size: 3rem;"></i>
+                <p class="text-muted my-3">Não é possível cadastrar novos profissionais.</p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{% url 'lista_profissional' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Voltar
+                    </a>
+                    <a href="{% url 'planos' %}" class="btn btn-primary">
+                        <i class="fas fa-crown me-2"></i>Ver Planos
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('form-profissional');
+    if (form) {
+        // Comentado a chamada AJAX, pois a validação já ocorre no backend
+        /*
+        form.addEventListener('submit', function(e) {
+            fetch('{% url "verificar_limite_profissionais" %}')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.pode_adicionar) {
+                        e.preventDefault();
+                        alert('Limite de profissionais atingido! Atualize seu plano para continuar.');
+                        window.location.href = '{% url "planos" %}';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao verificar limite:', error);
+                });
+        });
+        */
+
+        // Máscara para CPF
+        const cpfInput = document.querySelector('input[name="cpf"]');
+        if (cpfInput) {
+            cpfInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                e.target.value = value;
+            });
+        }
+
+        // Máscara para CNPJ
+        const cnpjInput = document.querySelector('input[name="cnpj"]');
+        if (cnpjInput) {
+            cnpjInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length <= 14) {
+                    value = value.replace(/(\d{2})(\d)/, '$1.$2');
+                    value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                    value = value.replace(/(\d{3})(\d)/, '$1/$2');
+                    value = value.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+                    e.target.value = value;
+                } else {
+                    e.target.value = value.substring(0, 14);
+                }
+            });
+        }
+
+        // Validação do percentual de comissão
+        const percentualInput = document.querySelector('input[name="percentual_comissao"]');
+        if (percentualInput) {
+            percentualInput.addEventListener('blur', function(e) {
+                const value = parseFloat(e.target.value);
+                if (value < 0 || value > 100) {
+                    e.target.setCustomValidity('O percentual deve estar entre 0 e 100');
+                } else {
+                    e.target.setCustomValidity('');
+                }
+            });
+        }
+    }
+});
+
+function mostrarModalUpgrade() {
+    document.getElementById('plano-upgrade-modal').classList.remove('hidden');
+}
+
+function fecharModal() {
+    document.getElementById('plano-upgrade-modal').classList.add('hidden');
+}
+
+document.getElementById('plano-upgrade-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        fecharModal();
+    }
+});
+</script>
+
+<div id="plano-upgrade-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+            <div class="text-center">
+                <i class="fas fa-crown text-yellow-500 text-4xl mb-4"></i>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2"></h3>
+                <p class="text-gray-600 mb-6">
+
+                </p>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

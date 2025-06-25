@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro de Estabelecimento</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-6">
+
+
+  <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-xl border border-gray-200">
+    <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">Cadastrar Estabelecimento</h2>
+
+    <form method="POST" action="{% url 'cadastro_estabelecimento' %}" class="space-y-4">
+      {% csrf_token %}
+
+      <!-- Campos de dados -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Nome do Responsável</label>
+        <input type="text" name="nome" class="w-full mt-1 p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Nome do Estabelecimento</label>
+        <input type="text" name="nome_estabelecimento" class="w-full mt-1 p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">CNPJ (opcional)</label>
+        <input type="text" name="cnpj" class="w-full mt-1 p-3 rounded-xl border border-gray-300">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Telefone</label>
+        <input type="text" name="telefone" class="w-full mt-1 p-3 rounded-xl border border-gray-300" required>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">E-mail</label>
+        <input type="email" name="email" class="w-full mt-1 p-3 rounded-xl border border-gray-300" required>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Senha</label>
+        <input type="password" name="senha" class="w-full mt-1 p-3 rounded-xl border border-gray-300" required>
+        <span id="forca-senha" class="text-xs text-gray-500 mt-1 block"></span>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Confirmar Senha</label>
+        <input type="password" name="confirmar_senha" class="w-full mt-1 p-3 rounded-xl border border-gray-300" required>
+      </div>
+
+      <!-- Select de plano -->
+      <div>
+        <label for="plano" class="block text-sm font-medium text-gray-700">Escolha um Plano</label>
+        <select name="plano" id="plano" required class="mt-1 block w-full p-3 rounded-xl border border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+          <option value="">Selecione...</option>
+          {% if planos %}
+            {% for plano in planos %}
+              <option value="{{ plano.id }}">{{ plano.nome }} - R$ {{ plano.valor }}</option>
+
+            {% endfor %}
+          {% else %}
+            <option disabled>Nenhum plano disponível no momento</option>
+          {% endif %}
+        </select>
+      </div>
+
+      <div class="text-center">
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl w-full transition-all duration-300 ease-in-out shadow-sm">
+          Criar Conta
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $('input[name="telefone"]').mask('(00) 00000-0000');
+      $('input[name="cnpj"]').mask('00.000.000/0000-00');
+
+      $('input[name="senha"]').on('input', function () {
+        const val = $(this).val();
+        let strength = 0;
+        if (val.length >= 8) strength++;
+        if (/[A-Z]/.test(val)) strength++;
+        if (/\d/.test(val)) strength++;
+        if (/[\W]/.test(val)) strength++;
+
+        let msg = '';
+        if (strength < 2) msg = 'Fraca';
+        else if (strength < 4) msg = 'Média';
+        else msg = 'Forte';
+
+        $('#forca-senha').text(`Força da senha: ${msg}`);
+      });
+    });
+  </script>
+</body>
+</html>

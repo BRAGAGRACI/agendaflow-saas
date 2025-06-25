@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4 fw-semibold text-center">Cadastrar Produto</h2>
+  <form method="post" class="p-4 bg-white shadow rounded">
+    {% csrf_token %}
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="id_nome" class="form-label fw-medium">Nome do Produto</label>
+        {{ form.nome }}
+        {% if form.nome.errors %}
+          <p class="text-danger">{{ form.nome.errors }}</p>
+        {% endif %}
+      </div>
+      <div class="col-md-3">
+        <label for="id_codigo" class="form-label fw-medium">Código</label>
+        {{ form.codigo }}
+        {% if form.codigo.errors %}
+          <p class="text-danger">{{ form.codigo.errors }}</p>
+        {% endif %}
+      </div>
+      <div class="col-md-3">
+        <label for="id_quantidade" class="form-label fw-medium">Quantidade</label>
+        {{ form.quantidade }}
+        {% if form.quantidade.errors %}
+          <p class="text-danger">{{ form.quantidade.errors }}</p>
+        {% endif %}
+      </div>
+      <div class="col-md-3">
+        <label for="id_preco_unitario" class="form-label fw-medium">Preço Unitário (R$)</label>
+        {{ form.preco_unitario }}
+        {% if form.preco_unitario.errors %}
+          <p class="text-danger">{{ form.preco_unitario.errors }}</p>
+        {% endif %}
+      </div>
+    </div>
+    <div class="text-center">
+      <button type="submit" class="btn btn-primary px-5 py-2">Cadastrar Produto</button>
+      <button type="button" class="btn btn-outline-primary px-5 py-2" data-bs-toggle="modal" data-bs-target="#listarProdutosModal">Listar Produtos</button>
+      <a href="{% url 'gerenciar_estoque' %}" class="btn btn-secondary px-5 py-2">Cancelar</a>
+    </div>
+  </form>
+</div>
+
+<!-- Modal de Listagem de Produtos -->
+<div class="modal fade" id="listarProdutosModal" tabindex="-1" aria-labelledby="listarProdutosModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="listarProdutosModalLabel">Produtos Cadastrados</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        {% if produtos_data %}
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Código</th>
+                <th>Quantidade</th>
+                <th>Preço Unitário (R$)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for produto in produtos_data %}
+                <tr>
+                  <td>{{ produto.nome }}</td>
+                  <td>{{ produto.codigo }}</td>
+                  <td>{{ produto.quantidade }}</td>
+                  <td>{{ produto.preco|floatformat:2 }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p>Nenhum produto cadastrado.</p>
+        {% endif %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .form-label {
+    color: #333;
+    font-size: 1rem;
+  }
+  .form-control {
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+    transition: border-color 0.3s ease;
+  }
+  .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+  }
+  .shadow {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  .btn-primary {
+    background-color: #007bff;
+    border: none;
+    font-weight: 500;
+  }
+  .btn-primary:hover {
+    background-color: #0056b3;
+  }
+  .btn-secondary {
+    background-color: #6c757d;
+    border: none;
+  }
+  .btn-secondary:hover {
+    background-color: #5a6268;
+  }
+  .table {
+    font-size: 0.95rem;
+  }
+</style>
+{% endblock %}

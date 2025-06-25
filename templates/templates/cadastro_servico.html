@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">
+                        <i class="fas fa-plus-circle"></i> {{ titulo }}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Exibir mensagens -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Formulário -->
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Nome do Serviço -->
+                        <div class="mb-3">
+                            <label for="{{ form.nome.id_for_label }}" class="form-label">
+                                {{ form.nome.label }} <span class="text-danger">*</span>
+                            </label>
+                            {{ form.nome }}
+                            {% if form.nome.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.nome.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Especialidade -->
+                        {% if form.especialidade %}
+                        <div class="mb-3">
+                            <label for="{{ form.especialidade.id_for_label }}" class="form-label">
+                                {{ form.especialidade.label }}
+                            </label>
+                            {{ form.especialidade }}
+                            {% if form.especialidade.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.especialidade.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Valor/Preço -->
+                        <div class="mb-3">
+                            <label for="{{ form.valor.id_for_label }}" class="form-label">
+                                {{ form.valor.label }} <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">R$</span>
+                                {{ form.valor }}
+                            </div>
+                            {% if form.valor.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.valor.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Duração -->
+                        <div class="mb-3">
+                            <label class="form-label">Duração do Serviço <span class="text-danger">*</span></label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="{{ form.duracao_horas.id_for_label }}" class="form-label small">
+                                        {{ form.duracao_horas.label }}
+                                    </label>
+                                    {{ form.duracao_horas }}
+                                    {% if form.duracao_horas.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.duracao_horas.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.duracao_minutos.id_for_label }}" class="form-label small">
+                                        {{ form.duracao_minutos.label }}
+                                    </label>
+                                    {{ form.duracao_minutos }}
+                                    {% if form.duracao_minutos.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.duracao_minutos.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Descrição -->
+                        <div class="mb-3">
+                            <label for="{{ form.descricao.id_for_label }}" class="form-label">
+                                {{ form.descricao.label }}
+                            </label>
+                            {{ form.descricao }}
+                            {% if form.descricao.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.descricao.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Valor Padrão (se existir) -->
+                        {% if form.valor_padrao %}
+                        <div class="mb-3">
+                            <label for="{{ form.valor_padrao.id_for_label }}" class="form-label">
+                                {{ form.valor_padrao.label }}
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">R$</span>
+                                {{ form.valor_padrao }}
+                            </div>
+                            {% if form.valor_padrao.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.valor_padrao.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Outros campos do formulário (caso existam) -->
+                        {% for field in form %}
+                            {% if field.name not in 'nome,especialidade,valor,duracao_horas,duracao_minutos,descricao,valor_padrao' %}
+                                <div class="mb-3">
+                                    <label for="{{ field.id_for_label }}" class="form-label">
+                                        {{ field.label }}
+                                    </label>
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in field.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        <!-- Botões -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'lista_servico' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Voltar
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Salvar Serviço
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

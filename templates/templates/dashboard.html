@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-80">
+  <!-- Navbar -->
+  <header class="bg-white shadow dark:bg-gray-900 dark:text-white">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+      <h1 class="text-xl font-bold text-gray-800 dark:text-white">Painel Administrativo</h1>
+      <div class="flex items-center gap-4">
+        <span class="text-gray-600 text-sm dark:text-gray-300">
+          Olá, <strong>{{ user.first_name|default:user.username }}</strong> 👋
+        </span>
+
+        {% if messages %}
+          <div class="space-y-2 ml-2">
+            {% for message in messages %}
+              <div class="bg-green-100 border border-green-300 text-green-800 px-4 py-2 rounded shadow">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="logout-button">Sair</button>
+        </form>
+      </div>
+    </div>
+  </header>
+
+  <!-- Banner -->
+  <section class="ai-banner mt-4 text-center">
+   {% if estabelecimento %}
+      <h1 class="text-3xl font-bold mb-2">{{ estabelecimento.nome }}</h1>
+      <p class="text-lg">Gestão inteligente para seu estabelecimento 💡</p>
+      {% if estabelecimento.tipo_estabelecimento %}
+        <span class="inline-block bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm mt-2">
+          {{ estabelecimento.get_tipo_estabelecimento_display }}
+        </span>
+      {% endif %}
+    {% else %}
+      <h1 class="text-3xl font-bold mb-2">AgendaFlow com Inteligência Artificial</h1>
+      <p class="text-lg">O futuro chegou! Organize sua clínica com precisão e estilo 💡</p>
+    {% endif %}
+    <div id="weather-box" class="mt-3 text-sm text-gray-100"></div>
+  </section>
+
+ <h1></h1>
+  <!-- Carrossel -->
+  <div class="carousel-container mt-10 mx-auto">
+    <div class="carousel-slide" id="carouselSlide">
+      <img src="{% static 'images/agenda1.jpg' %}" class="carousel-img" alt="Slide 1">
+      <img src="{% static 'images/agenda2.jpg' %}" class="carousel-img" alt="Slide 2">
+      <img src="{% static 'images/agenda3.jpg' %}" class="carousel-img" alt="Slide 3">
+      <img src="{% static 'images/agenda4.jpg' %}" class="carousel-img" alt="Slide 4">
+    </div>
+    <button class="prev" onclick="moveSlide(-1)">&#10094;</button>
+    <button class="next" onclick="moveSlide(1)">&#10095;</button>
+  </div>
+
+ <h1></h1>
+  <!-- Grid de atalhos -->
+  <main class="max-w-6xl mx-auto px-4 py-10">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <a href="{% url 'novo_agendamento' %}" class="card-button">📝➕ Novo Agendamento</a>
+      <a href="{% url 'listar_agendamentos' %}" class="card-button">📆 Home Agendamentos </a>
+      <a href="{% url 'agenda_diaria' %}" class="card-button">📅 Agenda Diária</a>
+      <a href="{% url 'cadastro_cliente' %}" class="card-button">👤 Novo Cliente</a>
+      <a href="{% url 'cadastro_servico' %}" class="card-button">🛠️ Novo Serviço</a>
+      <a href="{% url 'cadastro_profissional' %}" class="card-button">💼 Novo Profissional</a>
+      <a href="{% url 'lista_profissional' %}" class="card-button">📋 Listar Profissionais</a>
+      <a href="{% url 'lista_cliente' %}" class="card-button">📋 Listar Clientes</a>
+      <a href="{% url 'lista_servico' %}" class="card-button">📋 Listar Serviços</a>
+      <a href="{% url 'nova_venda' %}" class="card-button">💰 Vendas de  Produtos</a>
+      <a href="{% url 'dashboard_financeiro' %}" class="card-button">💰 Dashboard Financeiro</a>
+    </div>
+  </main>
+</div>
+
+{% if user.is_superuser %}
+  <li><a href="{% url 'painel_administrador' %}" class="card-button" >Painel Master 🧙‍♀️</a></li>
+{% endif %}
+
+
+<style>
+  .ai-banner {
+    background: linear-gradient(90deg, #0f0c29, #302b63, #24243e);
+    color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 224, 255, 0.2);
+  }
+
+  .carousel-container {
+    max-width: 1000px;
+    height: 400px;
+    overflow: hidden;
+    border-radius: 15px;
+    position: relative;
+  }
+
+  .carousel-slide {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    height: 100%;
+  }
+
+  .carousel-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    flex: 0 0 100%;
+  }
+
+  .prev, .next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.7);
+    font-size: 2rem;
+    padding: 10px 15px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    z-index: 1;
+  }
+
+  .prev:hover, .next:hover {
+    background: #00e0ff;
+    color: #fff;
+  }
+
+  .prev { left: 10px; }
+  .next { right: 10px; }
+
+  .card-button {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 70px;
+    font-size: 1.3rem;
+    padding: 4px;
+    background: linear-gradient(145deg, #1e002f, #33004d);
+    color: #f8f8ff;
+    font-weight: bold;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    z-index: 0;
+  }
+
+  .card-button::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    transform: rotate(25deg);
+    animation: shimmer 4s infinite;
+    z-index: 1;
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%) rotate(25deg); }
+    100% { transform: translateX(100%) rotate(25deg); }
+  }
+
+  .card-button:hover {
+    transform: scale(1.08);
+    background: linear-gradient(145deg, #ff00c8, #00e0ff);
+    color: #1e002f;
+    box-shadow: 0 0 20px #00e0ff, 0 0 40px #ff00c8;
+  }
+
+  .logout-button {
+    background-color: #0099ff;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+
+  .logout-button:hover {
+    background-color: #c10035;
+  }
+
+  body {
+    background-color: #f5f8fc;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  .dark-mode body {
+    background-color: #121212;
+    color: #f0f0f0;
+  }
+
+  .dark-mode .card-button {
+    background: linear-gradient(145deg, #2a003f, #52006f);
+    color: #e0e0e0;
+  }
+
+  .dark-mode .card-button:hover {
+    background: linear-gradient(145deg, #ff00c8, #00e0ff);
+    color: #1e002f;
+  }
+
+    .botao-dashboard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px; /* Menor */
+  margin: 12px auto;
+  border-radius: 20px;
+  font-size: 16px; /* Tamanho reduzido */
+  font-weight: 600;
+  width: 280px; /* Menor largura */
+  background: linear-gradient(90deg, #ff00cc, #3333ff);
+  color: white;
+  box-shadow: 0 0 12px rgba(255, 0, 255, 0.4);
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.botao-dashboard:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+}
+
+
+
+
+</style>
+
+<script>
+  let slideIndex = 0;
+  const slide = document.getElementById("carouselSlide");
+  const totalSlides = slide.children.length;
+
+  function moveSlide(n) {
+    slideIndex = (slideIndex + n + totalSlides) % totalSlides;
+    slide.style.transform = `translateX(-${slideIndex * 100}%)`;
+  }
+
+  setInterval(() => moveSlide(1), 5000);
+
+  // Clima
+  fetch('https://api.open-meteo.com/v1/forecast?latitude=-23.55&longitude=-46.63&current_weather=true')
+    .then(res => res.json())
+    .then(data => {
+      const temp = data.current_weather.temperature;
+      document.getElementById('weather-box').innerText = `🌤️ Tempo agora: ${temp}°C`;
+    });
+
+  // Modo escuro automático
+  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.documentElement.classList.add('dark-mode');
+  }
+</script>
+{% endblock %}

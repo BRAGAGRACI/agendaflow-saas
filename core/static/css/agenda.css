@@ -1,0 +1,72 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f6f8fa;
+}
+
+.agenda-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.horarios-coluna {
+  width: 80px;
+  background: #fff;
+  border-right: 1px solid #ccc;
+  padding-top: 45px;
+  overflow-y: scroll;
+}
+
+.horario {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+  color: #555;
+}
+
+.dias-scroll {
+  display: flex;
+  overflow-x: auto;
+  flex: 1;
+  background: #fafafa;
+}
+
+.dia-coluna {
+  min-width: 220px;
+  border-right: 1px solid #ddd;
+  padding: 10px;
+}
+
+.dia-titulo {
+  font-weight: bold;
+  text-align: center;
+  background-color: #e9ecef;
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.card-agendamento {
+  background-color: #dee2e6;
+  color: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.card-agendamento:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+@media (max-width: 640px) {
+  .animate-pulse-tech, .animate-particles { animation: none; }
+}

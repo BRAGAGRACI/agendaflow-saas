@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-semibold text-center flex-grow-1">Agenda do Dia - {{ data|date:'d/m/Y' }}</h2>
+    <a href="{% url 'novo_agendamento' %}" class="btn btn-primary me-2 px-3 py-2">+ Novo Agendamento</a>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-striped table-hover bg-white shadow rounded p-3">
+      <thead class="table-dark">
+        <tr>
+          <th class="p-3">Hora</th>
+          <th class="p-3">Cliente</th>
+          <th class="p-3">Profissional</th>
+          <th class="p-3">Serviço</th>
+          <th class="p-3">Valor</th>
+          <th class="p-3">Comissão</th>
+          <th class="p-3">Status</th>
+
+        </tr>
+      </thead>
+      <tbody>
+        {% for agendamento in agendamentos %}
+        <tr class="align-middle">
+          <td class="p-3">{{ agendamento.hora|time:'H:i' }}</td>
+          <td class="p-3">{{ agendamento.cliente.nome }}</td>
+          <td class="p-3">{{ agendamento.profissional.nome }}</td>
+          <td class="p-3">{{ agendamento.servico.nome }}</td>
+          <td class="p-3">R$ {{ agendamento.valor|floatformat:2 }}</td>
+          <td class="p-3">R$ {{ agendamento.valor_profissional|floatformat:2 }}</td>
+          <td class="p-3">
+            {% if agendamento.status == 'confirmado' %}
+              <span class="badge bg-success">Confirmado</span>
+            {% elif agendamento.status == 'aguardando' %}
+              <span class="badge bg-warning text-dark">Aguardando</span>
+            {% else %}
+              <span class="badge bg-danger">Não Compareceu</span>
+            {% endif %}
+          </td>
+
+
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8" class="text-center p-3">Nenhum agendamento para hoje.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+  .form-label {
+    color: #333;
+    font-size: 1rem;
+  }
+  .table-responsive {
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .table {
+    border-radius: 5px;
+  }
+  .table thead th {
+    background-color: #343a40;
+    color: #fff;
+    border: none;
+  }
+  .table tbody td {
+    vertical-align: middle;
+  }
+  .shadow {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  .btn-success {
+    background-color: #28a745;
+    border: none;
+    font-weight: 500;
+  }
+  .btn-success:hover {
+    background-color: #218838;
+  }
+  .btn-primary {
+    background-color: #007bff;
+    border: none;
+    font-weight: 500;
+  }
+  .btn-primary:hover {
+    background-color: #0056b3;
+  }
+  .btn-info {
+    background-color: #17a2b8;
+    border: none;
+    color: #fff;
+    font-weight: 500;
+  }
+  .btn-info:hover {
+    background-color: #138496;
+  }
+  .btn-sm {
+    border-radius: 5px;
+    padding: 4px 12px;
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% load custom_tags %}
+
+{% block content %}
+<style>
+  body {
+    font-family: 'Inter', sans-serif;
+  }
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: 120px repeat({{ num_dias }}, 1fr);
+    gap: 4px;
+    margin-top: 30px;
+  }
+
+  .calendar-day, .calendar-time {
+    background: #f9fafb;
+    border: 1px solid #d1d5db;
+    padding: 6px;
+    text-align: center;
+    font-size: 13px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+  }
+
+  .calendar-day:hover {
+    background-color: #e5e7eb;
+  }
+
+  .calendar-time {
+    font-weight: 600;
+    background-color: #e5e7eb;
+    color: #374151;
+  }
+
+  .appointment {
+    margin: 2px 0;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #fff;
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .appointment:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .status-confirmado {
+    background-color: #2ecc71;
+  }
+
+  .status-aguardando {
+    background-color: #f1c40f;
+  }
+
+  .status-cancelado {
+    background-color: #e74c3c;
+  }
+
+  .prof-color-0 { background-color: #3b82f6; } /* Azul */
+  .prof-color-1 { background-color: #8e44ad; } /* Roxo */
+  .prof-color-2 { background-color: #1abc9c; } /* Turquesa */
+  .prof-color-3 { background-color: #e67e22; } /* Laranja */
+  .prof-color-4 { background-color: #d35400; } /* Laranja Escuro */
+  .prof-color-5 { background-color: #3498db; } /* Azul Claro */
+  .prof-color-6 { background-color: #9b59b6; } /* Roxo Claro */
+  .prof-color-7 { background-color: #16a085; } /* Verde-Água */
+  .prof-color-8 { background-color: #f39c12; } /* Amarelo */
+  .sidebar {
+    background: #f0f4f8;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 30px;
+    box-shadow: 0 0 5px rgba(0, 0,0, 0.1);
+  }
+
+  .btn {
+    border-radius: 10px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-success {
+    background-color: #2ecc71;
+  }
+
+  .btn-success:hover {
+    background-color: #27ae60;
+  }
+
+  .btn-outline-secondary {
+    border-color: #b0bec5;
+    color: #455a64;
+  }
+
+  .btn-outline-secondary:hover {
+    background-color: #eceff1;
+  }
+
+  .header-title {
+    font-weight: 700;
+    font-size: 22px;
+    color: #2c3e50;
+  }
+
+  .search-input {
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    padding: 8px;
+  }
+
+  .list-group-item {
+    font-size: 14px;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
+
+  .list-group-item:hover {
+    background-color: #e1e7eb;
+  }
+</style>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-3 sidebar">
+      <h5 class="mb-3">Filtrar por Profissional</h5>
+      <input type="text" class="form-control mb-3 search-input" id="search" placeholder="Buscar profissional">
+      <ul class="list-group" id="prof-filter-list-group">
+        <li class="list-group-item">
+          <input type="radio" name="profissional" id="show-all" value="" onchange="filterByProfessional(this)" {% if not request.GET.profissional %}checked{% endif %}>
+          <label for="show-all">Mostrar Todos</label>
+        </li>
+        {% for prof in profissionais %}
+        <li class="list-group-item">
+          <input type="radio" name="profissional" value="{{ prof.profissional__nome }}" onchange="filterByProfessional(this)" {% if request.GET.profissional == prof.profissional__nome %}checked{% endif %}>
+          {{ prof.profissional__nome }}
+        </li>
+        {% endfor %}
+      </ul>
+      <hr>
+      <p class="text-muted">{{ data_atual|date:"F Y" }}</p>
+    </div>
+
+    <div class="col-md-9">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="header-title">Agenda - {{ data_atual|date:"F Y" }}</h2>
+        <div class="d-flex gap-2">
+          <a href="{% url 'novo_agendamento' %}" class="btn btn-primary me-2 px-3 py-2">+ Agendar</a>
+          <a href="?ano={{ mes_anterior.year }}&mes={{ mes_anterior.month }}{% if request.GET.profissional %}&profissional={{ request.GET.profissional }}{% endif %}" class="btn btn-outline-secondary">← Mês Anterior</a>
+          <a href="?ano={{ mes_proximo.year }}&mes={{ mes_proximo.month }}{% if request.GET.profissional %}&profissional={{ request.GET.profissional }}{% endif %}" class="btn btn-outline-secondary">Próximo Mês →</a>
+        </div>
+      </div>
+
+      <div class="calendar-grid">
+        <div class="calendar-time"></div>
+        {% for i in "x"|ljust:num_dias %}
+          <div class="calendar-day fw-bold">{{ forloop.counter }}</div>
+        {% endfor %}
+
+        {% for horario, label in horarios %}
+        <div class="calendar-time">{{ label }}</div>
+        {% for i in "x"|ljust:num_dias %}
+          <div class="calendar-day">
+            {% for ag in agendamentos %}
+              {% if ag.data.day == forloop.parentloop.counter and ag.hora.hour == horario.hour %}
+                {% with prof_index=cor_profissionais|get_item:ag.profissional.nome %}
+                  <div class="appointment status-{{ ag.status }} prof-color-{{ prof_index|default:'0' }}">
+                    <strong>{{ ag.cliente.nome }}</strong><br>
+                    <small>{{ ag.servico.nome }}</small><br>
+                    <span class="text-white-50">{{ ag.profissional.nome }}</span>
+                  </div>
+                {% endwith %}
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endfor %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function filterByProfessional(radio) {
+    const url = new URL(window.location.href);
+    if (radio.value) {
+      url.searchParams.set('profissional', radio.value);
+    } else {
+      url.searchParams.delete('profissional');
+    }
+    window.location = url.toString();
+  }
+
+  document.getElementById('search').addEventListener('input', function () {
+    let filter = this.value.toLowerCase();
+    document.querySelectorAll('input[name="profissional"]').forEach(input => {
+      const li = input.parentElement;
+      const text = li.textContent.toLowerCase();
+      li.style.display = text === 'Mostrar Todos' || text.includes(filter) ? '' : 'none';
+    });
+  });
+</script>
+{% endblock %}
+
+{% block extra_scripts %}
+  {% include 'base_scripts.html' %}
+{% endblock %}

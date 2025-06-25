@@ -1,0 +1,15 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-5">
+  <h2 class="text-center fw-bold mb-4" style="color: #4a00e0;">Excluir Plano</h2>
+  <div class="card shadow rounded p-4 text-center">
+    <p>Deseja realmente excluir o plano <strong>{{ plano.nome }}</strong>?</p>
+    <form method="POST">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Excluir</button>
+      <a href="{% url 'dashboard_financeiro' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

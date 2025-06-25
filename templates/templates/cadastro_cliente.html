@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card shadow-sm p-4">
+    <h2 class="mb-3">{{ titulo }}</h2>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary mt-3">Salvar</button>
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary mt-3 ms-2">← Voltar</a>
+    </form>
+</div>
+{% endblock %}

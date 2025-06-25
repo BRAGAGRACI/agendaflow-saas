@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4 text-center fw-bold">Editar Agendamento</h2>
+
+  <form method="post" class="bg-white shadow rounded p-4">
+    {% csrf_token %}
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="id_cliente" class="form-label">Cliente</label>
+        <select name="cliente" id="id_cliente" class="form-control" required>
+          {% for cliente in clientes %}
+            <option value="{{ cliente.id }}" {% if agendamento.cliente.id == cliente.id %}selected{% endif %}>
+              {{ cliente.nome }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label for="id_profissional" class="form-label">Profissional</label>
+        <select name="profissional" id="id_profissional" class="form-control" required>
+          {% for prof in profissionais %}
+            <option value="{{ prof.id }}" {% if agendamento.profissional.id == prof.id %}selected{% endif %}>
+              {{ prof.nome }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="id_servico" class="form-label">Serviço</label>
+        <select name="servico" id="id_servico" class="form-control" required>
+          {% for servico in servicos %}
+            <option value="{{ servico.id }}" {% if agendamento.servico.id == servico.id %}selected{% endif %}>
+              {{ servico.nome }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label for="id_data" class="form-label">Data</label>
+        <input type="date" name="data" id="id_data" class="form-control" value="{{ agendamento.data|date:'Y-m-d' }}" required>
+      </div>
+      <div class="col-md-3">
+        <label for="id_hora" class="form-label">Hora</label>
+        <input type="time" name="hora" id="id_hora" class="form-control" value="{{ agendamento.hora|time:'H:i' }}" required>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="id_status" class="form-label">Status</label>
+        <select name="status" id="id_status" class="form-control" required>
+          <option value="confirmado" {% if agendamento.status == 'confirmado' %}selected{% endif %}>Confirmado</option>
+          <option value="aguardando" {% if agendamento.status == 'aguardando' %}selected{% endif %}>Aguardando</option>
+          <option value="nao_compareceu" {% if agendamento.status == 'nao_compareceu' %}selected{% endif %}>Não Compareceu</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label for="id_forma_pagamento" class="form-label">Forma de Pagamento</label>
+        <select name="forma_pagamento" id="id_forma_pagamento" class="form-control" required>
+          <option value="pix" {% if agendamento.forma_pagamento == 'pix' %}selected{% endif %}>Pix</option>
+          <option value="dinheiro" {% if agendamento.forma_pagamento == 'dinheiro' %}selected{% endif %}>Dinheiro</option>
+          <option value="debito" {% if agendamento.forma_pagamento == 'debito' %}selected{% endif %}>Cartão de Débito</option>
+          <option value="credito" {% if agendamento.forma_pagamento == 'credito' %}selected{% endif %}>Cartão de Crédito</option>
+          <option value="convenio" {% if agendamento.forma_pagamento == 'convenio' %}selected{% endif %}>Convênio</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-between mt-4">
+      <a href="{% url 'listar_agendamentos' %}" class="btn btn-secondary">Voltar</a>
+      <button type="submit" class="btn btn-success px-4">Salvar Alterações</button>
+    </div>
+  </form>
+</div>
+
+<!-- Estilo opcional -->
+<style>
+  .form-label {
+    font-weight: 500;
+  }
+  .form-control {
+    border-radius: 5px;
+  }
+  .btn {
+    border-radius: 5px;
+  }
+</style>
+
+<script>
+    const clientes = JSON.parse('{{ clientes_data|safe }}');
+    const profissionais = JSON.parse('{{ profissionais_data|safe }}');
+    const servicos = JSON.parse('{{ servicos_data|safe }}');
+
+    const clienteSelect = document.getElementById('id_cliente');
+    const profissionalSelect = document.getElementById('id_profissional');
+    const servicoSelect = document.getElementById('id_servico');
+
+    // Função para popular selects
+    function popularSelect(selectElement, lista, campoTexto = 'nome') {
+        selectElement.innerHTML = '';
+        lista.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.id;
+            option.textContent = item[campoTexto];
+            selectElement.appendChild(option);
+        });
+    }
+
+    // Popula os selects
+    if (clienteSelect && clientes.length > 0) {
+        popularSelect(clienteSelect, clientes);
+        clienteSelect.value = '{{ agendamento.cliente.id }}';
+    }
+
+    if (profissionalSelect && profissionais.length > 0) {
+        popularSelect(profissionalSelect, profissionais);
+        profissionalSelect.value = '{{ agendamento.profissional.id }}';
+    }
+
+    if (servicoSelect && servicos.length > 0) {
+        popularSelect(servicoSelect, servicos);
+        servicoSelect.value = '{{ agendamento.servico.id }}';
+    }
+</script>
+
+
+
+{% endblock %}

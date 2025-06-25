@@ -1,0 +1,61 @@
+model Tenant {
+  id                String   @id @default(cuid())
+  name              String
+  email             String   @unique
+  plan              String   @default("free") // free, basic, premium
+  emailConfig       Json?    // Configurações SMTP do cliente
+  whatsappConfig    Json?    // Configurações WhatsApp
+  reminderSettings  Json     @default("{}")
+  active            Boolean  @default(true)
+  createdAt         DateTime @default(now())
+
+  appointments      Appointment[]
+  patients          Patient[]
+  doctors           Doctor[]
+  reminderLogs      ReminderLog[]
+}
+
+model Appointment {
+  id              String    @id @default(cuid())
+  tenantId        String
+  patientId       String
+  doctorId        String
+  date            DateTime
+  time            String
+  status          String    @default("confirmed")
+  reminderSent    Boolean   @default(false)
+  paymentStatus   String    @default("pending")
+  createdAt       DateTime  @default(now())
+
+  tenant          Tenant    @relation(fields: [tenantId], references: [id])
+  patient         Patient   @relation(fields: [patientId], references: [id])
+  doctor          Doctor    @relation(fields: [doctorId], references: [id])
+  reminderLogs    ReminderLog[]
+}
+
+model Patient {
+  id              String    @id @default(cuid())
+  tenantId        String
+  name            String
+  email           String?
+  phone           String
+  acceptsEmail    Boolean   @default(true)
+  acceptsWhatsapp Boolean   @default(true)
+
+  tenant          Tenant    @relation(fields: [tenantId], references: [id])
+  appointments    Appointment[]
+}
+
+model ReminderLog {
+  id              String    @id @default(cuid())
+  tenantId        String
+  appointmentId   String
+  type            String    // email, whatsapp
+  status          String    // success, failed
+  message         String?
+  sentAt          DateTime  @default(now())
+
+  tenant          Tenant    @relation(fields: [tenantId], references: [id])
+  appointment     Appointment @relation(fields: [appointmentId], references: [id])
+}
+*/
